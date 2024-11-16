@@ -23,9 +23,8 @@ const store = makeInMemoryStore({
 require("events").EventEmitter.defaultMaxListeners = 50;
 
 const { File } = require("megajs");
-const fs = require("fs");
 
-//Other shit
+// Other setup code...
 
 (async function () {
   var prefix = "Nikka-X";
@@ -129,7 +128,7 @@ async function Abhiy() {
           }
         }
       });
-      console.log("ᴘʟᴜɢɪɴs ɪɴsᴛᴀʟʟʀᴅ ✅");
+      console.log("ᴘʟᴜɢɪɴs ɪɴsᴛᴀʟʟᴇᴅ ✅");
 
       fs.readdirSync("./plugins").forEach((plugin) => {
         if (path.extname(plugin).toLowerCase() === ".js") {
@@ -142,7 +141,7 @@ async function Abhiy() {
       const packageVersion = require("./package.json").version;
       const totalPlugins = events.commands.length;
       const workType = config.WORK_TYPE;
-      const statusMessage = `ɴɪᴋᴋᴀ x ᴍᴅ ᴄᴏɴɴᴇᴄᴛᴇᴅ  ✅\nᴠᴇʀsɪᴏɴ: ${packageVersion}\nᴄᴍᴅs: ${totalPlugins}\ᴡᴏʀᴋᴛʏᴘᴇ: ${workType}\n 𝗺𝗮𝗱𝗲 𝘄𝗶𝘁𝗵 ❤️ 𝗯𝘆 𝗵𝗮𝗸𝗶`;
+      const statusMessage = `ɴɪᴋᴋᴀ x ᴍᴅ ᴄᴏɴɴᴇᴄᴛᴇᴅ  ✅\nᴠᴇʀsɪᴏɴ: ${packageVersion}\nᴄᴍᴅs: ${totalPlugins}\nᴡᴏʀᴋᴛʏᴘᴇ: ${workType}\n 𝗺𝗮𝗱𝗲 𝘄𝗶𝘁𝗵 ❤️ 𝗯𝘆 𝗵𝗮𝗸𝗶`;
 
       await conn.sendMessage(conn.user.id, {
         image: { url: "https://files.catbox.moe/mnp025.jpg" },
@@ -165,17 +164,6 @@ async function Abhiy() {
 
         if (!msg.message) return;
 
-        let text_msg = msg.body;
-        if (text_msg && config.LOGS) {
-          console.log(
-            `At : ${
-              msg.from.endsWith("@g.us")
-                ? (await conn.groupMetadata(msg.from)).subject
-                : msg.from
-            }\nFrom : ${msg.sender}\nMessage:${text_msg}`
-          );
-        }
-
         events.commands.map(async (command) => {
           if (
             command.fromMe &&
@@ -186,47 +174,31 @@ async function Abhiy() {
             return;
 
           let comman;
-          if (text_msg) {
-            comman = text_msg.trim().split(/ +/)[0];
-            msg.prefix = new RegExp(config.HANDLERS).test(text_msg)
-              ? text_msg.split("").shift()
+          if (msg.body) {
+            comman = msg.body.trim().split(/ +/)[0];
+            msg.prefix = new RegExp(config.HANDLERS).test(msg.body)
+              ? msg.body.split("").shift()
               : ",";
           }
 
           if (command.pattern && command.pattern.test(comman)) {
             var match;
             try {
-              match = text_msg.replace(new RegExp(comman, "i"), "").trim();
+              match = msg.body.replace(new RegExp(comman, "i"), "").trim();
             } catch {
               match = false;
             }
 
             whats = new Message(conn, msg, ms);
             command.function(whats, match, msg, conn);
-          } else if (text_msg && command.on === "text") {
-            whats = new Message(conn, msg, ms);
-            command.function(whats, text_msg, msg, conn, m);
-          } else if (
-            (command.on === "image" || command.on === "photo") &&
-            msg.type === "imageMessage"
-          ) {
-            whats = new Image(conn, msg, ms);
-            command.function(whats, text_msg, msg, conn, m, ms);
-          } else if (
-            command.on === "sticker" &&
-            msg.type === "stickerMessage"
-          ) {
-            whats = new Sticker(conn, msg, ms);
-            command.function(whats, msg, conn, m, ms);
           }
         });
 
-        // Add the listener to check for media types and long text messages
-        
-
-        const text = msg.message.conversation || '';
+        const text = msg.message.conversation || "";
         if (text.length > 500) {
-          await conn.sendMessage(msg.from, { text: 'Your message is too long and could cause issues.' });
+          await conn.sendMessage(msg.from, {
+            text: "Your message is too long and could cause issues.",
+          });
         }
       });
     } catch (e) {
