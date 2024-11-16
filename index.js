@@ -14,7 +14,7 @@ const got = require("got");
 const config = require("./config");
 const { PluginDB } = require("./lib/database/plugins");
 const Greetings = require("./lib/Greetings");
-const { MakeSession } = require("./lib/session");
+const saveCreds  = require("./lib/session");
 
 const store = makeInMemoryStore({
   logger: pino().child({ level: "silent", stream: "store" }),
@@ -23,11 +23,7 @@ const store = makeInMemoryStore({
 require("events").EventEmitter.defaultMaxListeners = 50;
 
 if (!fs.existsSync("./lib/session/creds.json")) {
-  MakeSession(
-    config.SESSION_ID,
-    "lib/session",
-    "mongodb://mongo:IsdhEkEzeMOImPUMSECqaqYsScTmpzha@mongodb.railway.internal:27017"
-  ).then(() => {
+  saveCreds(config.SESSION_ID).then(() => {
     console.log("Version : " + require("./package.json").version);
   });
 }
