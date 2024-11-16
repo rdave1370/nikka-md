@@ -22,11 +22,43 @@ const store = makeInMemoryStore({
 
 require("events").EventEmitter.defaultMaxListeners = 50;
 
-if (!fs.existsSync("./lib/session/creds.json")) {
-  saveCreds(config.SESSION_ID).then(() => {
-    console.log("Version : " + require("./package.json").version);
-  });
-}
+const { File } = require("megajs");
+const fs = require("fs");
+
+//Other shit
+
+(async function () {
+  var prefix = "Nikka-X";
+  var output = "./lib/session/";
+  var pth = output + "creds.json";
+
+  try {
+    var store = makeInMemoryStore({
+      logger: pino().child({ level: "silent", stream: "store" }),
+    });
+
+    require("events").EventEmitter.defaultMaxListeners = 50;
+
+    if (!fs.existsSync(pth)) {
+      if (!config.SESSION_ID.startsWith(prefix)) {
+        throw new Error("Invalid session id.");
+      }
+
+      var url = "https://mega.nz/file/" + config.SESSION_ID.replace(prefix, "");
+      var file = File.fromURL(url);
+      await file.loadAttributes();
+
+      if (!fs.existsSync(output)) {
+        fs.mkdirSync(output, { recursive: true });
+      }
+
+      var data = await file.downloadBuffer();
+      fs.writeFileSync(pth, data);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+})();
 
 fs.readdirSync("./lib/database/").forEach((plugin) => {
   if (path.extname(plugin).toLowerCase() === ".js") {
@@ -190,16 +222,7 @@ async function Abhiy() {
         });
 
         // Add the listener to check for media types and long text messages
-        const messageType = Object.keys(msg.message)[0];
-        if (messageType === 'imageMessage') {
-          await conn.sendMessage(msg.from, { text: 'I detected an image in your message.' });
-        } else if (messageType === 'videoMessage') {
-          await conn.sendMessage(msg.from, { text: 'I detected a video in your message.' });
-        } else if (messageType === 'audioMessage') {
-          await conn.sendMessage(msg.from, { text: 'I detected an audio file in your message.' });
-        } else if (messageType === 'documentMessage') {
-          await conn.sendMessage(msg.from, { text: 'I detected a document in your message.' });
-        }
+        
 
         const text = msg.message.conversation || '';
         if (text.length > 500) {
