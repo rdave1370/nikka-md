@@ -6,7 +6,7 @@ const {
 } = require("@whiskeysockets/baileys");
 const fs = require("fs");
 const { serialize } = require("./lib/serialize");
-const { Message, Image, Sticker } = require("./lib/Base");
+const { Message } = require("./lib/Base");
 const pino = require("pino");
 const path = require("path");
 const events = require("./lib/event");
@@ -14,7 +14,7 @@ const got = require("got");
 const config = require("./config");
 const { PluginDB } = require("./lib/database/plugins");
 const Greetings = require("./lib/Greetings");
-const saveCreds  = require("./lib/session");
+const saveCreds = require("./lib/session");
 
 const store = makeInMemoryStore({
   logger: pino().child({ level: "silent", stream: "store" }),
@@ -23,8 +23,6 @@ const store = makeInMemoryStore({
 require("events").EventEmitter.defaultMaxListeners = 50;
 
 const { File } = require("megajs");
-
-// Other setup code...
 
 (async function () {
   var prefix = "Nikka-X";
@@ -141,7 +139,7 @@ async function Abhiy() {
       const packageVersion = require("./package.json").version;
       const totalPlugins = events.commands.length;
       const workType = config.WORK_TYPE;
-      const statusMessage = `ɴɪᴋᴋᴀ x ᴍᴅ ᴄᴏɴɴᴇᴄᴛᴇᴅ  ✅\nᴠᴇʀsɪᴏɴ: ${packageVersion}\nᴄᴍᴅs: ${totalPlugins}\nᴡᴏʀᴋᴛʏᴘᴇ: ${workType}\n 𝗺𝗮𝗱𝗲 𝘄𝗶𝘁𝗵 ❤️ 𝗯𝘆 𝗵𝗮𝗸𝗶`;
+      const statusMessage = `ɴɪᴋᴋᴀ x ᴍᴅ ᴄᴏɴɴᴇᴄᴛᴇᴅ  ✅\nᴠᴇʀsɪᴏɴ: ${packageVersion}\nᴄᴍᴅs: ${totalPlugins}\ᴡᴏʀᴋᴛʏᴘᴇ: ${workType}\n 𝗺𝗮𝗱𝗲 𝘄𝗶𝘁𝗵 ❤️ 𝗯𝘆 𝗵𝗮𝗸𝗶`;
 
       await conn.sendMessage(conn.user.id, {
         image: { url: "https://files.catbox.moe/mnp025.jpg" },
@@ -164,6 +162,17 @@ async function Abhiy() {
 
         if (!msg.message) return;
 
+        let text_msg = msg.body;
+        if (text_msg && config.LOGS) {
+          console.log(
+            `At : ${
+              msg.from.endsWith("@g.us")
+                ? (await conn.groupMetadata(msg.from)).subject
+                : msg.from
+            }\nFrom : ${msg.sender}\nMessage:${text_msg}`
+          );
+        }
+
         events.commands.map(async (command) => {
           if (
             command.fromMe &&
@@ -174,32 +183,28 @@ async function Abhiy() {
             return;
 
           let comman;
-          if (msg.body) {
-            comman = msg.body.trim().split(/ +/)[0];
-            msg.prefix = new RegExp(config.HANDLERS).test(msg.body)
-              ? msg.body.split("").shift()
+          if (text_msg) {
+            comman = text_msg.trim().split(/ +/)[0];
+            msg.prefix = new RegExp(config.HANDLERS).test(text_msg)
+              ? text_msg.split("").shift()
               : ",";
           }
 
           if (command.pattern && command.pattern.test(comman)) {
             var match;
             try {
-              match = msg.body.replace(new RegExp(comman, "i"), "").trim();
+              match = text_msg.replace(new RegExp(comman, "i"), "").trim();
             } catch {
               match = false;
             }
 
             whats = new Message(conn, msg, ms);
             command.function(whats, match, msg, conn);
+          } else if (text_msg && command.on === "text") {
+            whats = new Message(conn, msg, ms);
+            command.function(whats, text_msg, msg, conn, m);
           }
         });
-
-        const text = msg.message.conversation || "";
-        if (text.length > 500) {
-          await conn.sendMessage(msg.from, {
-            text: "Your message is too long and could cause issues.",
-          });
-        }
       });
     } catch (e) {
       console.log(e.stack + "\n\n\n\n\n" + JSON.stringify(msg));
