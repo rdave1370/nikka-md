@@ -32,7 +32,7 @@ message.client.sendMessage(message.jid, zeta, {
 }
 );
 
-const { command, isPrivate } = require("../lib/");
+
 command(
   {
     pattern: "babe",
