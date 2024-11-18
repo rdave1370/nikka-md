@@ -539,3 +539,78 @@ async function generateProfilePicture(buffer) {
     preview: await cropped.normalize().getBufferAsync(Jimp.MIME_JPEG),
   };
 }
+
+const fs = require("fs");
+
+command(
+    {
+        pattern: "vcf",
+        fromMe: false,
+        desc: "Generate a VCF file of group contacts with WhatsApp names",
+        type: "group",
+    },
+    async (message) => {
+        if (!message.isGroup) {
+            return await message.reply("*This command works only in group chats!*");
+        }
+
+        // Notify user that the contact file is being prepared
+        await message.reply("Sending contact file...");
+
+        try {
+            // Fetch group metadata
+            const groupMetadata = await message.client.groupMetadata(message.jid);
+            if (!groupMetadata || !groupMetadata.participants.length) {
+                return await message.reply("*No members found in this group.*");
+            }
+
+            let vcfContent = "";
+            console.log("Group participants:", groupMetadata.participants);  // Debug log for participants
+
+            // Generate VCF content for each participant
+            for (const participant of groupMetadata.participants) {
+                try {
+                    const name = message.pushName || participant.id.split("@")[0]; // Use pushName if available, else fallback to phone number
+                    const phone = participant.id.split("@")[0];
+
+                    // Append the contact information to the VCF content
+                    vcfContent += `
+BEGIN:VCARD
+VERSION:3.0
+FN:${name}
+TEL:+${phone}
+END:VCARD
+`;
+                } catch (err) {
+                    console.error(`Error processing participant ${participant.id}:`, err);
+                }
+            }
+
+            // Debug: Log the VCF content
+            console.log("Generated VCF Content:", vcfContent);
+
+            // Ensure that VCF content is not empty
+            if (!vcfContent.trim()) {
+                return await message.reply("*Unable to generate VCF. Please try again.*");
+            }
+
+            // Save the VCF content to a file
+            const vcfFilePath = "./GROUP VCF.vcf";
+            fs.writeFileSync(vcfFilePath, vcfContent);
+
+            // Send the file
+            await message.client.sendMessage(message.jid, {
+                document: { url: vcfFilePath },
+                mimetype: "text/x-vcard",
+                fileName: "GroupContacts.vcf",
+            });
+
+            // Optional cleanup after sending the file
+            fs.unlinkSync(vcfFilePath);
+
+        } catch (error) {
+            console.error("An error occurred:", error);
+            await message.reply("*An error occurred while generating the contact file. Please try again.*");
+        }
+    }
+);
