@@ -85,3 +85,28 @@ const { name, username, avatar, posts, following, followers, description } =
 await message.client.sendMessage(message.jid, { image:{url: avatar} ,  mimetype:"image/jpeg", caption: `\n*INSTAGRAM DETAILS*\n\n> *USERNAME* : ${username}\n> *NAME* : ${name}\n> *BIO* : ${description}\n> *POSTS* : ${posts}\n> *FOLLOWERS* : ${followers}\n> *FOLLOWING* : ${following}\n\n𝗜𝗭𝗨𝗠𝗜 𝗫𝗗🧚‍♂️`}, {quoted: message });
     }
     );
+command(
+  {
+    pattern: "ss ?(.*)",
+    fromMe: true,
+    desc: "Screenshots a site",
+    type: "misc",
+  },
+  async (message, match) => {
+    if (!match) {
+      return await message.sendMessage("*Please provide a URL to screenshot.*");
+    }
+
+    const screenshotUrl = `https://ssweb-livid.vercel.app/ss?url=${encodeURIComponent(match)}`;
+
+    await message.client.sendMessage(
+      message.jid,
+      {
+        image: { url: screenshotUrl },
+        mimetype: "image/jpeg",
+        caption: "nikka md",
+      },
+      { quoted: message }
+    );
+  }
+);
