@@ -54,9 +54,9 @@ const imageUrl = "https://files.catbox.moe/etg6fk.jpg"; // Replace with your ima
 
 
 ## Credits:
-<a href = "">H4KI SER</a>
-STAR KING</br>
-IRON M4N</br>
-PARADOXICAL</br> 
+👉 <a href = "https://haki.us.kg">H4KI SER</a></b>
+👉 <a href = "#">STAR KING</a></b>
+👉 <a href = "#">IRON M4N</a></>
+👉 <a href = "#">PARADOXICAL</a></b>
 
 ## all rights reserved, made with so much ❤️ by haki🍀
