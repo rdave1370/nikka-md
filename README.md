@@ -54,7 +54,7 @@ const imageUrl = "https://files.catbox.moe/etg6fk.jpg"; // Replace with your ima
 
 
 ## Credits:
-H4KI SER</br>
+<a href = "">H4KI SER</a>
 STAR KING</br>
 IRON M4N</br>
 PARADOXICAL</br> 
