@@ -39,3 +39,15 @@ const imageUrl = "https://files.catbox.moe/flinnf.jpg"; // Developer image
     }
 );
 ```
+
+### only image 
+```
+const imageUrl = "https://files.catbox.moe/etg6fk.jpg"; // Replace with your image URL
+
+        await message.client.sendMessage(message.jid, {
+            image: { url: imageUrl },
+            caption: devInfo,
+        });
+    }
+);
+```
