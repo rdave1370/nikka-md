@@ -54,9 +54,9 @@ const imageUrl = "https://files.catbox.moe/etg6fk.jpg"; // Replace with your ima
 
 
 ## Credits:
-### H4KI SER
-### STAR KING
-### IRON M4N
-### PARADOXICAL 
+H4KI SER
+STAR KING
+IRON M4N
+PARADOXICAL 
 
-## all rights reserved, made with so much ❤️ by haki🍀
+all rights reserved, made with so much ❤️ by haki🍀
