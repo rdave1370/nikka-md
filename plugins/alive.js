@@ -25,7 +25,7 @@ command({
         'externalAdReply': {
           'title': "ʜᴇʏ ᴘᴏᴏᴋɪᴇ",
           'body': "𝗡𝗶𝗸𝗸𝗮 𝗺𝗱",
-          'sourceUrl': "",
+          'sourceUrl': "https://whatsapp.com/channel/0029VaoLotu42DchJmXKBN3L",
           'mediaUrl': "",
           'mediaType': 1,
           'showAdAttribution': true,
