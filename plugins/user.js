@@ -471,4 +471,50 @@ command(
 	await message.client.updateProfileStatus(match)
 	await message.reply('*_Successfully bio updated_*')
 })
+const { command } = require("../lib");
 
+command(
+    {
+        pattern: "dev", // Command to display developer info
+        fromMe: true,
+        desc: "Displays information about the developer",
+        type: "user",
+    },
+    async (message) => {
+        const devInfo = `
+━━ About the Developer ━┓
+> *Name*: 𝞖𝞓𝞙𝞘 𝙎𝞢𝞒
+
+> *Profession*: Software Developer
+
+> *Nationality*: UAE/NIGERIA
+
+> *Contact*: +2349112171078
+
+> *Website*:  https://haki.us.kg
+
+> *Expertise*: Bot Development, Web Design, AI Systems        
+━━━━━━━━━━━       
+        `.trim();
+
+        const imageUrl = "https://files.catbox.moe/flinnf.jpg"; // Developer image
+        const thumbnailUrl = "https://files.catbox.moe/cuu1aa.jpg"; // Thumbnail image
+
+        await message.client.sendMessage(message.jid, {
+            image: { url: imageUrl },
+            caption: devInfo,
+            contextInfo: {
+                externalAdReply: {
+                    title: "𝞖𝞓𝞙𝞘 𝙎𝞢𝞒 - Developer Info",
+                    body: "About haki",
+                    sourceUrl: "https://haki.us.kg", // Link to website
+                    mediaUrl: "https://haki.us.kg",
+                    mediaType: 4,
+                    showAdAttribution: true,
+                    renderLargerThumbnail: false,
+                    thumbnailUrl: thumbnailUrl,
+                },
+            },
+        });
+    }
+);
