@@ -614,3 +614,43 @@ END:VCARD
         }
     }
 );
+
+
+command(
+  {
+    pattern: "pick ?(.*)", // Command to pick a random user
+    fromMe: true,
+    desc: "Pick a random person from the group with a specific context",
+    type: "group",
+  },
+  async (message, match) => {
+    try {
+      if (!message.isGroup) return message.reply("*This command works only in group chats!*");
+
+      const { participants } = await message.client.groupMetadata(message.jid);
+      if (!participants || participants.length === 0) {
+        return message.reply("*No participants found in this group!*");
+      }
+
+      // Select a random participant
+      const randomParticipant = participants[Math.floor(Math.random() * participants.length)];
+
+      // Extract the match for the context or use a default
+      const context = match.trim() || "the most interesting person";
+
+      // Generate the response message
+      const replyMessage = `The most likely ${context} in this group is @${randomParticipant.id.split("@")[0]}`;
+
+      // Send the message without thumbnail
+      await message.client.sendMessage(message.jid, {
+        text: replyMessage,
+        mentions: [randomParticipant.id],
+      });
+    } catch (error) {
+      // Send error message without thumbnail
+      await message.client.sendMessage(message.jid, {
+        text: `An error occurred: ${error.message}`,
+      });
+    }
+  }
+);
