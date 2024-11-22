@@ -539,7 +539,7 @@ command(
 	await message.client.updateProfileStatus(match)
 	await message.reply('*_Successfully bio updated_*')
 })
-const { command } = require("../lib");
+
 
 command(
     {
