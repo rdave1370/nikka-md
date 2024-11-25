@@ -6,76 +6,90 @@ command(
   {
     pattern: "getfile",
     fromMe: isPrivate,
-    desc: "Retrieve a file from the plugins folder.",
+    desc: "Fetches any file from the bot's directories.",
     type: "utility",
   },
   async (message, match) => {
     try {
-      // Check if a file name is provided
+      // Check if the user provided a file path
       if (!match) {
-        return await message.reply("*Please specify the file name, e.g., `.getfile filename.js`.*");
+        return await message.reply(
+          "Please provide the file path, e.g., `.getfile ./plugins/example.js`."
+        );
       }
 
-      // Define the path to the plugins folder
-      const filePath = path.resolve("./plugins", match.trim());
+      // Resolve the file path
+      const filePath = path.resolve(match);
 
       // Check if the file exists
       if (!fs.existsSync(filePath)) {
-        return await message.reply(`*File not found: ${match.trim()}*`);
+        return await message.reply("*File not found. Please check the file path.*");
+      }
+
+      // Ensure the path is within the bot's directory for security
+      const botDirectory = path.resolve("./");
+      if (!filePath.startsWith(botDirectory)) {
+        return await message.reply(
+          "*Access denied. You can only access files within the bot's directory.*"
+        );
       }
 
       // Send the file
       await message.client.sendMessage(
         message.jid,
         {
-          document: fs.readFileSync(filePath),
-          fileName: match.trim(),
-          mimetype: "application/octet-stream",
+          document: { url: filePath },
+          fileName: path.basename(filePath),
+          mimetype: "text/plain",
         },
         { quoted: message }
       );
-
-      // Confirm successful sending
-      await message.reply(`*File sent successfully: ${match.trim()}*`);
     } catch (error) {
-      console.error("Error retrieving file:", error);
-      await message.reply("*Failed to retrieve the file. Please check the file name and try again.*");
+      console.error("Error fetching file:", error);
+      await message.reply(`*Failed to retrieve the file. Error: ${error.message}*`);
     }
   }
 );
+
+
 command(
   {
     pattern: "listfiles",
     fromMe: isPrivate,
-    desc: "Lists all .js files in the plugins folder.",
+    desc: "Lists files in a specified directory.",
     type: "utility",
   },
-  async (message) => {
+  async (message, match) => {
     try {
-      // Define the plugins folder path
-      const pluginsPath = path.resolve("./plugins");
+      // If no directory is specified, default to the root directory
+      const targetDir = path.resolve(match || "./");
 
-      // Check if the folder exists
-      if (!fs.existsSync(pluginsPath)) {
-        return await message.reply("*Plugins folder not found.*");
+      // Ensure the directory is within the bot's root directory for security
+      const botDirectory = path.resolve("./");
+      if (!targetDir.startsWith(botDirectory)) {
+        return await message.reply(
+          "*Access denied. You can only list files within the bot's directory.*"
+        );
       }
 
-      // Read all files in the plugins directory
-      const files = fs.readdirSync(pluginsPath);
-
-      // Filter files to only include .js files
-      const jsFiles = files.filter((file) => file.endsWith(".js"));
-
-      // Check if there are any .js files
-      if (jsFiles.length === 0) {
-        return await message.reply("*No files found in the plugins folder.*");
+      // Check if the directory exists
+      if (!fs.existsSync(targetDir)) {
+        return await message.reply("*Directory not found. Please check the path.*");
       }
 
-      // Create a formatted list of the files
-      const fileList = jsFiles.map((file, index) => `${index + 1}. ${file}`).join("\n");
+      // Read the directory and filter files only
+      const files = fs
+        .readdirSync(targetDir)
+        .filter((file) => fs.statSync(path.join(targetDir, file)).isFile());
 
-      // Send the list to the user
-      await message.reply(`*Available files in plugins folder:*\n\n${fileList}`);
+      // If no files found, reply accordingly
+      if (files.length === 0) {
+        return await message.reply(`*No files found in directory: ${targetDir}*`);
+      }
+
+      // Send the list of files
+      const fileList = files.map((file) => `- ${file}`).join("\n");
+      await message.reply(`*Files in directory: ${targetDir}*\n\n${fileList}`);
     } catch (error) {
       console.error("Error listing files:", error);
       await message.reply(`*Failed to list files. Error: ${error.message}*`);
