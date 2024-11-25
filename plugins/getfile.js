@@ -43,3 +43,42 @@ command(
     }
   }
 );
+command(
+  {
+    pattern: "listfiles",
+    fromMe: isPrivate,
+    desc: "Lists all .js files in the plugins folder.",
+    type: "utility",
+  },
+  async (message) => {
+    try {
+      // Define the plugins folder path
+      const pluginsPath = path.resolve("./plugins");
+
+      // Check if the folder exists
+      if (!fs.existsSync(pluginsPath)) {
+        return await message.reply("*Plugins folder not found.*");
+      }
+
+      // Read all files in the plugins directory
+      const files = fs.readdirSync(pluginsPath);
+
+      // Filter files to only include .js files
+      const jsFiles = files.filter((file) => file.endsWith(".js"));
+
+      // Check if there are any .js files
+      if (jsFiles.length === 0) {
+        return await message.reply("*No files found in the plugins folder.*");
+      }
+
+      // Create a formatted list of the files
+      const fileList = jsFiles.map((file, index) => `${index + 1}. ${file}`).join("\n");
+
+      // Send the list to the user
+      await message.reply(`*Available files in plugins folder:*\n\n${fileList}`);
+    } catch (error) {
+      console.error("Error listing files:", error);
+      await message.reply(`*Failed to list files. Error: ${error.message}*`);
+    }
+  }
+);
