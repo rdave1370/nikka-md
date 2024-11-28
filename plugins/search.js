@@ -90,7 +90,7 @@ command(
     pattern: "ss ?(.*)",
     fromMe: true,
     desc: "Screenshots a site",
-    type: "misc",
+    type: "search",
   },
   async (message, match) => {
     if (!match) {
@@ -108,5 +108,72 @@ command(
       },
       { quoted: message }
     );
+  }
+);
+
+
+command(
+  {
+    pattern: "ggs",
+    fromMe: isPrivate,
+    desc: "Searches Google for the provided query",
+    type: "search",
+  },
+  async (message, query) => {
+    try {
+      query = query || message.text;
+      if (!query || query.trim().length === 0) {
+        return await message.reply(
+          `*🌐 Google Search Command*\n\n` +
+          `╔═════════════════✦═╗\n` +
+          `❗ Please provide a query to search.\n` +
+          `Example: !ggs king haki\n` +
+          `╚═════════════════✦═╝`
+        );
+      }
+
+      // API URL for Google search
+      const apiUrl = `https://api.giftedtech.my.id/api/search/google?apikey=gifted&query=${encodeURIComponent(query)}`;
+      const response = await axios.get(apiUrl);
+      const data = response.data;
+
+      // Check if the API call was successful and contains results
+      if (data.status !== 200 || !data.success || !data.results || data.results.length === 0) {
+        return await message.reply("No results found for your search.");
+      }
+
+      // Format the search results with decorative elements
+      let resultMessage = `╔═════════════════✦═╗\n       🌐 *Google Search Results*\n╚═════════════════✦═╝\n\n`;
+      data.results.forEach((result, index) => {
+        resultMessage += `════════════\n`;
+        resultMessage += `🔹 *${index + 1}. ${result.title}*\n${result.description}\n[🔗 Link](${result.url})\n`;
+        resultMessage += `════════════\n\n`;
+      });
+
+      // Fetch the thumbnail
+      const thumbnailUrl = "https://files.catbox.moe/mnp025.jpg"; // URL for thumbnail
+      const thumbnailBuffer = await getBuffer(thumbnailUrl);
+
+      // Send the results with the thumbnail and additional info
+      await message.client.sendMessage(message.jid, {
+        image: thumbnailBuffer,
+        caption: resultMessage,
+        contextInfo: {
+          externalAdReply: {
+            title: "ʜᴇʏ ᴘᴏᴏᴋɪᴇ",
+            body: "𝗡𝗶𝗸𝗸𝗮 𝗺𝗱",
+            sourceUrl: "https://whatsapp.com/channel/0029VaoLotu42DchJmXKBN3L",
+            mediaUrl: "",
+            mediaType: 1,
+            showAdAttribution: true,
+            renderLargerThumbnail: false,
+            thumbnailUrl: thumbnailUrl,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      return message.reply(`An error occurred while performing the search: ${error.message}`);
+    }
   }
 );
