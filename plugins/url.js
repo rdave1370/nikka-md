@@ -1,57 +1,102 @@
-const { IMGBB_KEY } = require('../config');
-const ffmpeg = require('fluent-ffmpeg');
-const { upload } = require('../lib/imgur');
-const { command, isPrivate } = require("../lib");
-const fs = require('fs');
-const pathh = './fileUrl.mp3';
-
-async function webpUpload(file){
-    return new Promise(async (resolve)=>{
-    const webpupload = require("imgbb-uploader");
-    for (let key of IMGBB_KEY){
-    const options = {apiKey: key,imagePath: file};
-    var res = await webpupload(options)
-    if (res.url) return resolve(res.url);
-    }
-});
-}
-
-command({
-    pattern: "url",
+const {
+  command,
+  isPrivate,
+  getBuffer
+} = require("../lib/");
+const axios = require('axios');
+const FormData = require("form-data");
+command(
+  {
+    pattern: "makeurl",
     fromMe: isPrivate,
-    desc: "url maker",
-    type: "misc",
+    desc: "Upload an image, audio, or video file",
+    type: "tools",
   },
   async (message, match, m) => {
+    // Check if the user is replying to a message
+    if (!message.reply_message) {
+      return await message.reply("❗ Please reply to an image, video, or audio file to upload.");
+    }
 
-if (message.reply_message.sticker){
-    return await message.client.sendMessage(message.jid,{text:"_"+(await webpUpload(await m.quoted.download()))+"_"},{ quoted:message })
-}
-else if (message.reply_message.audio){
-    if (message.reply_message.duration > 90) return await message.client.sendMessage(message.jid,{text:'*_Audio too large. Try below 90 seconds!_*'},{ quoted:message });
-    fs.writeFileSync(pathh, await m.quoted.download());
-    await message.reply("*_Uploading Url…_*")
-    ffmpeg(pathh).outputOptions(["-y", "-filter_complex", "[0:a]showvolume=f=1:b=4:w=720:h=68,format=yuv420p[vid]", "-map", "[vid]", "-map 0:a"]).save('output.mp4').on('end', async () => {
-    try { var res = await upload('output.mp4'); } catch {return await message.client.sendMessage(message.jid,{text:"*_Failed to upload file!_*"},{ quoted:message });}
-    return await message.client.sendMessage(message.jid,{text:"_"+res.link+"_"},{ quoted:message });
-});
-}
-else if (message.reply_message.image){
-    const imgp = './dldImg.jpg';
-    fs.writeFileSync(imgp,await m.quoted.download());
-    let {link} = await upload(imgp)
-if (typeof link == 'function'){
-    return await message.reply("*_There are issues with Bot's IP & imgur, so uploading can't be done_*")
-}
-try { await message.client.sendMessage(message.jid,{text:"_"+link+"_"},{ quoted:message }) } catch {return await message.client.sendMessage(message.jid,{text:"*_Failed to upload file!_*"},{ quoted:message });}
-} else if(message.reply_message.video){
-const imgp = './dldVideo.mp4';
-    fs.writeFileSync(imgp,await m.quoted.download());
-    let {link} = await upload(imgp)
-if (typeof link == 'function'){
-    return await message.reply("*_There are issues with Bot's IP & imgur, so uploading can't be done_*")
-}
-try { await message.client.sendMessage(message.jid,{text:"_"+link+"_"},{ quoted:message }) } catch {return await message.client.sendMessage(message.jid,{text:"*_Failed to upload file!_*"},{ quoted:message });}
-}
-else return await message.reply("*_Reply to image/video/audio_*");
-});
+    // Check if the replied message contains valid media
+    const isImage = message.reply_message.image;
+    const isVideo = message.reply_message.video;
+    const isAudio = message.reply_message.audio;
+    const isSticker = message.reply_message.sticker;
+
+    if (!isImage && !isVideo && !isAudio && !isSticker) {
+      return await message.reply("❗ Please reply to a valid image, video, or audio file.");
+    }
+
+    // Download the file based on the type of media
+    let buff = await m.quoted.download();
+
+    // Determine the file extension based on the media type
+    let extension = '';
+    if (isImage) {
+      extension = '.jpg'; // Default extension for images
+    } else if (isVideo) {
+      extension = '.mp4'; // Default extension for videos
+    } else if (isAudio) {
+      extension = '.mp3'; // Default extension for audio
+    } else if (isSticker) {
+      extension = '.webp'; // Default extension for stickers
+    }
+
+    // Prepare the FormData object to send to the API
+    const formData = new FormData();
+    formData.append('file', buff, { filename: 'file' + extension });
+
+    try {
+      // Make the API request to upload the file
+      const response = await axios.post('https://itzpire.com/tools/upload', formData, {
+        headers: {
+          ...formData.getHeaders(),
+        },
+      });
+
+      // Handle the response from the API
+      if (response.data.status === "success" && response.data.fileInfo && response.data.fileInfo.url) {
+        let fileUrl = response.data.fileInfo.url;
+
+        // Ensure the correct file extension is added to the URL
+        if (!fileUrl.endsWith(extension)) {
+          fileUrl += extension;
+        }
+
+        // Aesthetic and customized success message with thumbnail
+        const successMessage = `
+╔═════════════════✦═╗
+║ 🎉 File Uploaded! 🎉  ║
+╠═════════════════✦═╣
+║  Platform: itzpire
+╠═════════════════✦═╣
+║ 📎 Link: ${fileUrl}  
+╚═════════════════✦═╝`;
+
+        // Send the upload result with the file URL and include a thumbnail
+        await message.client.sendMessage(message.jid, {
+          text: successMessage,
+          contextInfo: {
+            externalAdReply: {
+              title: "Powered by Haki",
+              body: "File Upload Service",
+              sourceUrl: "https://whatsapp.com/channel/0029VaoLotu42DchJmXKBN3L",
+              mediaUrl: fileUrl,
+              mediaType: 1,
+              showAdAttribution: true,
+              renderLargerThumbnail: false,
+              thumbnailUrl: "https://files.catbox.moe/mnp025.jpg", // Your thumbnail URL
+            }
+          }
+        });
+
+      } else {
+        await message.reply("❗ Failed to upload the file. Please try again later.");
+      }
+    } catch (error) {
+      console.error(error);
+      await message.reply("❗ An error occurred while uploading the file. Please try again.");
+    }
+  }
+);
