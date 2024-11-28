@@ -332,7 +332,7 @@ Description: ${i.desc}\`\`\``);
           menu += `\n╚═════════════════✦═╝`;
           let comad = cmnd.filter(({ type }) => type == cmmd);
           comad.forEach(({ cmd }) => {
-            menu += `\n❁  ${cmd.trim()}`;
+            menu += `\n[᯽]  ${cmd.trim()}`;
           });
           menu += `\n╚═════════════════✦═╝`;
         });
@@ -349,7 +349,7 @@ Description: ${i.desc}\`\`\``);
               externalAdReply: {
                 title: "𝗡𝗶𝗸𝗸𝗮",
                 body: "",
-                sourceUrl: "",
+                sourceUrl: "https://whatsapp.com/channel/0029VaoLotu42DchJmXKBN3L",
                 mediaUrl: "",
                 mediaType: 1,
                 showAdAttribution: true,
