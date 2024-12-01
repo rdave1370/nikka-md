@@ -177,3 +177,77 @@ command(
     }
   }
 );
+//const axios = require("axios"); // Axios for HTTP requests
+
+command(
+  {
+    pattern: "phone",
+    fromMe: isPrivate,
+    desc: "Searches for phones based on the provided query",
+    type: "search",
+  },
+  async (message, query) => {
+    try {
+      query = query || message.text;
+      if (!query || query.trim().length === 0) {
+        return await message.reply(
+          `*📱 Phone Search Command*\n\n` +
+          `╔═════════════════✦═╗\n` +
+          `❗ Please provide a phone model or keyword to search.\n` +
+          `Example: !phone Samsung Galaxy\n` +
+          `╚═════════════════✦═╝`
+        );
+      }
+
+      // API URL for phone search
+      const apiUrl = `https://nikka-api.us.kg/gsmarena?q=${encodeURIComponent(query)}&apiKey=nikka`;
+      const response = await axios.get(apiUrl);
+      const data = response.data;
+
+      // Ensure `data.data` is valid and iterable
+      if (!data || !data.data || !data.data.data || !Array.isArray(data.data.data)) {
+        return await message.reply("No phones found or unexpected response format.");
+      }
+
+      // Extract the phone list
+      const phones = data.data.data;
+
+      // Format the phone results
+      let resultMessage = `╔═════════════════✦═╗\n       📱 *Phone Search Results*\n╚═════════════════✦═╝\n\n`;
+      for (const phone of phones) {
+        resultMessage += `════════════\n`;
+        resultMessage += `🔹 *${phone.name}*\n`;
+        resultMessage += `${phone.description}\n`;
+        resultMessage += `[🔗 View More Details](https://gsmarena.com/${phone.id})\n`;
+        resultMessage += `════════════\n\n`;
+      }
+
+      // Fetch the thumbnail
+      const thumbnailUrl = "https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-a55.jpg"; // Example thumbnail URL
+      const thumbnailBuffer = await axios
+        .get(thumbnailUrl, { responseType: "arraybuffer" })
+        .then((res) => Buffer.from(res.data, "binary"));
+
+      // Send the results with the thumbnail and additional info
+      await message.client.sendMessage(message.jid, {
+        image: thumbnailBuffer,
+        caption: resultMessage,
+        contextInfo: {
+          externalAdReply: {
+            title: "ʜᴇʏ ᴘᴏᴏᴋɪᴇ",
+            body: "𝗡𝗶𝗸𝗸𝗮 𝗺𝗱",
+            sourceUrl: "https://whatsapp.com/channel/0029VaoLotu42DchJmXKBN3L",
+            mediaUrl: "",
+            mediaType: 1,
+            showAdAttribution: true,
+            renderLargerThumbnail: false,
+            thumbnailUrl: thumbnailUrl,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      return message.reply(`An error occurred while performing the phone search: ${error.message}`);
+    }
+  }
+);
