@@ -151,9 +151,37 @@ async function Abhiy() {
       conn.ev.on("creds.update", saveCreds);
 
       conn.ev.on("group-participants.update", async (data) => {
-        Greetings(data, conn);
-      });
+  try {
+    const metadata = await conn.groupMetadata(data.id); // Fetch group metadata
+    const groupName = metadata.subject;
 
+    if (data.action === "add") {
+      for (const participant of data.participants) {
+        const ppUrl = await conn.profilePictureUrl(participant, "image").catch(() => null);
+        const welcomeMessage = `Hello @${participant.split("@")[0]}, welcome to *${groupName}*! 🎉\nFeel free to introduce yourself and enjoy your stay.`;
+
+        await conn.sendMessage(data.id, {
+          image: { url: ppUrl || "https://files.catbox.moe/placeholder.png" }, // Fallback image
+          caption: welcomeMessage,
+          mentions: [participant],
+        });
+      }
+    } else if (data.action === "remove") {
+      for (const participant of data.participants) {
+        const ppUrl = await conn.profilePictureUrl(participant, "image").catch(() => null);
+        const goodbyeMessage = `Goodbye @${participant.split("@")[0]}, we’ll miss you from *${groupName}*. 😢`;
+
+        await conn.sendMessage(data.id, {
+          image: { url: ppUrl || "https://files.catbox.moe/placeholder.png" }, // Fallback image
+          caption: goodbyeMessage,
+          mentions: [participant],
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Error in group participant update handler:", error);
+  }
+});
       conn.ev.removeAllListeners("messages.upsert");
       conn.ev.on("messages.upsert", async (m) => {
         if (m.type !== "notify") return;
