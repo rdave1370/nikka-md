@@ -2,7 +2,7 @@ const { command, isPrivate, getBuffer } = require("../lib/");
 command(
   {
     pattern: "owner",
-    fromMe: isPrivate,
+    fromMe: false,
     desc: "developer vcard",
     type: "user",
   },
@@ -36,7 +36,7 @@ message.client.sendMessage(message.jid, zeta, {
 command(
   {
     pattern: "babe",
-    fromMe: isPrivate,
+    fromMe: false,
     desc: "developer vcard",
     type: "user",
   },
