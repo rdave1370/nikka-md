@@ -1,4 +1,4 @@
-const { command, isPrivate } = require("../lib/");
+const { command, isPrivate, getBuffer } = require("../lib/");
 command(
   {
     pattern: "owner",
@@ -66,3 +66,44 @@ message.client.sendMessage(message.jid, zeta, {
 }
 );
 // +2348127980925
+
+
+let audio = "https://cdn.ironman.my.id/i/giimtw.mp4";
+let videoUrl = "https://www.instagram.com/reel/C2GMrOCsU7a/";
+let thumbnailImageUrl = "https://files.catbox.moe/stnf08.jpg";
+
+command(
+  {
+    on: "text",
+    fromMe: false,
+  },
+  async (message) => {
+    try {
+      if (message.message?.conversation && message.message.conversation.toLowerCase().includes("haki")) {
+        let buff = await getBuffer(audio);
+
+        await message.client.sendMessage(message.jid, {
+          audio: buff,
+          mimetype: "audio/mpeg",
+          ptt: true,
+          seconds: 3838338,
+          fileLength: "10000000",
+          contextInfo: {
+            externalAdReply: {
+              title: "ωнσ мєηтισηє∂ му ѕєηѕєι",
+              body: "𝞖𝞓𝞙𝞘 𝞦𝞢𝞒",
+              sourceUrl: "https://wa.me/2349112171078",
+              mediaUrl: videoUrl,
+              mediaType: 2,
+              showAdAttribution: true,
+              renderLargerThumbnail: 0,
+              thumbnailUrl: thumbnailImageUrl,
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+);
