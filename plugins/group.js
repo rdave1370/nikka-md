@@ -654,3 +654,25 @@ command(
     }
   }
 );
+
+
+command(
+  {
+    on: "message",
+    fromMe: false,
+  },
+  async (message) => {
+    try {
+      if (message.isGroup && message.message && message.message.extendedTextMessage) {
+        const mentions = message.message.extendedTextMessage.contextInfo.mentionedJid || [];
+        if (mentions.includes(message.client.user.jid)) {
+          await message.reply("Hey????");
+        }
+      }
+    } catch (error) {
+      console.error("Error in mention listener:", error);
+    }
+  }
+);
+
+
