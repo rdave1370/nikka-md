@@ -1,2 +1,2 @@
 run:
-   worker: npm start 
+   worker: node haki.js 
