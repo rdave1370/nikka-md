@@ -1,2 +1,2 @@
 run:
-   worker: node haki.js 
+   worker: node heroku.js 
