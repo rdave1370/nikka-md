@@ -205,11 +205,9 @@ conn.ev.on("group-participants.update", async (data) => {
 
         events.commands.map(async (command) => {
           if (
-            command.fromMe &&
-            !config.SUDO?.split(",").includes(
-              msg.sender?.split("@")[0] || !msg.isSelf
-            )
-          )
+  command.fromMe &&
+  !config.SUDO.includes(msg.sender?.split("@")[0] || !msg.isSelf)
+)
             return;
 
           let comman;
@@ -251,4 +249,3 @@ conn.ev.on("group-participants.update", async (data) => {
 setTimeout(() => {
   Abhiy();
 }, 3000);
-
