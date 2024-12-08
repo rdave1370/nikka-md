@@ -1,1 +1,1 @@
-worker: node haki.js 
+web: node heroku.js 
