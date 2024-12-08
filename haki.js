@@ -240,8 +240,8 @@ conn.ev.on("group-participants.update", async (data) => {
   });
 
   process.on("uncaughtException", async (err) => {
-    let error = err.message;
-    console.log(err);
+    //let error = err.message;
+    //console.log(err);
     await conn.sendMessage(conn.user.id, { text: error });
   });
 }
