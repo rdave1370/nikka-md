@@ -15,51 +15,51 @@ const got = require("got");
 const config = require("./config");
 const { PluginDB } = require("./lib/database/plugins");
 const Greetings = require("./lib/Greetings");
-const saveCreds = require("./lib/session");
+const { File } = require("megajs");
 
-// Express setup
+// Initialize Express
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.get("/", (req, res) => {
-  res.send("Nikka-X bot is running!");
-});
+// Middleware for JSON parsing (if needed)
+app.use(express.json());
 
+// Create in-memory store
 const store = makeInMemoryStore({
   logger: pino().child({ level: "silent", stream: "store" }),
 });
 
 require("events").EventEmitter.defaultMaxListeners = 50;
 
-const { File } = require("megajs");
-
-(async function () {
-  var prefix = "Nikka-X";
-  var output = "./lib/session/";
-  var pth = output + "creds.json";
+// Setup the main functionality
+async function initializeSession() {
+  const output = "./lib/session/";
+  const pth = output + "creds.json";
+  const prefix = "Nikka-X";
 
   try {
     if (!fs.existsSync(pth)) {
       if (!config.SESSION_ID.startsWith(prefix)) {
-        throw new Error("Invalid session id.");
+        throw new Error("Invalid session ID.");
       }
 
-      var url = "https://mega.nz/file/" + config.SESSION_ID.replace(prefix, "");
-      var file = File.fromURL(url);
+      const url = "https://mega.nz/file/" + config.SESSION_ID.replace(prefix, "");
+      const file = File.fromURL(url);
       await file.loadAttributes();
 
       if (!fs.existsSync(output)) {
         fs.mkdirSync(output, { recursive: true });
       }
 
-      var data = await file.downloadBuffer();
+      const data = await file.downloadBuffer();
       fs.writeFileSync(pth, data);
     }
   } catch (error) {
-    console.error(error);
+    console.error("Error initializing session:", error);
   }
-})();
+}
 
+// Read and load plugins
 fs.readdirSync("./lib/database/").forEach((plugin) => {
   if (path.extname(plugin).toLowerCase() === ".js") {
     require("./lib/database/" + plugin);
@@ -88,87 +88,84 @@ async function Abhiy() {
 
   setInterval(() => {
     store.writeToFile("./lib/store_db.json");
-    console.log("saved store");
+    console.log("Saved store");
   }, 30 * 60 * 1000);
 
+  // Connection events and handlers
   conn.ev.on("connection.update", async (s) => {
     const { connection, lastDisconnect } = s;
 
     if (connection === "connecting") {
-      console.log("ɴɪᴋᴋᴀ");
-      console.log("ᴘʀᴏᴄᴇssɪɴɢ sᴇssɪᴏɴ ɪᴅ");
+      console.log("Connecting session...");
     }
 
-    if (
-      connection === "close" &&
-      lastDisconnect &&
-      lastDisconnect.error &&
-      lastDisconnect.error.output.statusCode !== 401
-    ) {
-      if (conn?.state?.connection !== "open") {
-        console.log(lastDisconnect.error.output.payload);
-        Abhiy();
-      }
+    if (connection === "close" && lastDisconnect?.error?.output?.statusCode !== 401) {
+      console.log(lastDisconnect.error.output.payload);
+      Abhiy(); // Reconnect
     }
 
     if (connection === "open") {
-      console.log("ʟᴏɢɪɴ sᴜᴄᴄᴇssғᴜʟ ✅");
-      console.log("ɪɴsᴛᴀʟʟɪɴɢ ᴘʟᴜɢɪɴs 📥");
+      console.log("Login successful ✅");
 
+      // Install plugins dynamically
       let plugins = await PluginDB.findAll();
-      plugins.map(async (plugin) => {
-        if (!fs.existsSync("./plugins/" + plugin.dataValues.name + ".js")) {
-          console.log(plugin.dataValues.name);
-          var response = await got(plugin.dataValues.url);
+      plugins.forEach(async (plugin) => {
+        if (!fs.existsSync(`./plugins/${plugin.dataValues.name}.js`)) {
+          console.log(`Installing plugin: ${plugin.dataValues.name}`);
+          const response = await got(plugin.dataValues.url);
           if (response.statusCode === 200) {
-            fs.writeFileSync(
-              "./plugins/" + plugin.dataValues.name + ".js",
-              response.body
-            );
-            require("./plugins/" + plugin.dataValues.name + ".js");
+            fs.writeFileSync(`./plugins/${plugin.dataValues.name}.js`, response.body);
+            require(`./plugins/${plugin.dataValues.name}.js`);
           }
         }
       });
-      console.log("ᴘʟᴜɢɪɴs ɪɴsᴛᴀʟʟᴇᴅ ✅");
+
+      console.log("Plugins installed ✅");
 
       fs.readdirSync("./plugins").forEach((plugin) => {
         if (path.extname(plugin).toLowerCase() === ".js") {
-          require("./plugins/" + plugin);
+          require(`./plugins/${plugin}`);
         }
       });
-
-      console.log("ɴɪᴋᴋᴀ x ᴍᴅ ᴄᴏɴɴᴇᴄᴛᴇᴅ ✅");
     }
 
-    try {
-      conn.ev.on("creds.update", saveCreds);
+    conn.ev.on("creds.update", saveCreds);
 
-      conn.ev.removeAllListeners("group-participants.update");
-      conn.ev.on("group-participants.update", async (data) => {
-        // Handle group participants update
-      });
+    // Group events handler
+    conn.ev.on("group-participants.update", async (data) => {
+      // Handle group participant events here (e.g., welcome/goodbye messages)
+    });
 
-      conn.ev.removeAllListeners("messages.upsert");
-      conn.ev.on("messages.upsert", async (m) => {
-        // Handle message events
+    // Message events handler
+    conn.ev.on("messages.upsert", async (m) => {
+      if (m.type !== "notify") return;
+      const msg = await serialize(JSON.parse(JSON.stringify(m.messages[0])), conn);
+
+      if (!msg.message) return;
+
+      // Process commands
+      events.commands.forEach(async (command) => {
+        // Command processing logic
       });
-    } catch (e) {
-      console.log(e.stack);
-    }
+    });
   });
 
   process.on("uncaughtException", async (err) => {
-    let error = err.message;
-    console.log(err);
-    await conn.sendMessage(conn.user.id, { text: error });
+    console.error("Unhandled exception:", err);
   });
 }
 
-setTimeout(() => {
+// Route for status check
+app.get("/", (req, res) => {
+  res.send("Server is running. Nikka-X is active.");
+});
+
+// Start the WhatsApp bot after initializing session
+initializeSession().then(() => {
   Abhiy();
-}, 3000);
+});
 
 // Start the Express server
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
