@@ -251,3 +251,66 @@ command(
     }
   }
 );
+
+
+command(
+  {
+    pattern: "bingsearch",
+    fromMe: isPrivate,
+    desc: "Fetches Bing search results.",
+    type: "text",
+  },
+  async (message, match) => {
+    try {
+      const query = match.trim();
+
+      if (!query) {
+        return message.reply("Please provide a search query.");
+      }
+
+      // Make the API call to get Bing search results
+      const apiUrl = `https://api.nexoracle.com/search/bing-search?apikey=free_key@maher_apis&q=${encodeURIComponent(query)}&mkt=en-US`;
+      const response = await axios.get(apiUrl);
+
+      // Check if the API returned results
+      if (response.data.status === 200 && response.data.result.length > 0) {
+        const results = response.data.result;
+
+        // Create the message with the search results
+        let resultMessage = `🔍 *Bing Search Results for:* _${query}_\n\n`;
+
+        results.forEach((result, index) => {
+          resultMessage += `*${index + 1}. ${result.title}*\n`;
+          resultMessage += `URL: ${result.url}\n`;
+          resultMessage += `Description: ${result.description}\n\n`;
+        });
+
+        const imageUrl = "https://files.catbox.moe/flinnf.jpg"; // Developer image
+        const thumbnailUrl = "https://files.catbox.moe/cuu1aa.jpg"; // Thumbnail image
+
+        // Send the result with thumbnail and developer info
+        await message.client.sendMessage(message.jid, {
+          image: { url: imageUrl },
+          caption: resultMessage,
+          contextInfo: {
+            externalAdReply: {
+              title: "𝞖𝞓𝞙𝞘 𝙎𝞢𝞒 - Developer Info",
+              body: "About haki",
+              sourceUrl: "https://haki.us.kg", // Link to website
+              mediaUrl: "https://haki.us.kg",
+              mediaType: 4,
+              showAdAttribution: true,
+              renderLargerThumbnail: false,
+              thumbnailUrl: thumbnailUrl,
+            },
+          },
+        });
+      } else {
+        await message.reply("Sorry, no results found for your query.");
+      }
+    } catch (error) {
+      console.error(error);
+      await message.reply("An error occurred while fetching the search results.");
+    }
+  }
+);
