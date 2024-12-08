@@ -11,7 +11,6 @@ const { serialize } = require("./lib/serialize");
 const { Message } = require("./lib/Base");
 const pino = require("pino");
 const path = require("path");
-const express = require("express);
 const events = require("./lib/event");
 const got = require("got");
 const config = require("./config");
@@ -22,8 +21,6 @@ const saveCreds = require("./lib/session");
 const store = makeInMemoryStore({
   logger: pino().child({ level: "silent", stream: "store" }),
 });
-
-const PORT = process.env.PORT || 3000;
 require("events").EventEmitter.defaultMaxListeners = 50;
 
 const { File } = require("megajs");
