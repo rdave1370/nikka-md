@@ -22,7 +22,7 @@ const saveCreds = require("./lib/session");
 const store = makeInMemoryStore({
   logger: pino().child({ level: "silent", stream: "store" }),
 });
-const app = express();
+
 const PORT = process.env.PORT || 3000;
 require("events").EventEmitter.defaultMaxListeners = 50;
 
@@ -254,9 +254,4 @@ conn.ev.on("group-participants.update", async (data) => {
 setTimeout(() => {
   Abhiy();
 }, 3000);
-
-InitializeBot();
-app.listen(PORT, () => {
-    console.log(`bot has started at port ${PORT}`)
-};
 
