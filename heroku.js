@@ -1,4 +1,4 @@
-const express = require("express");
+/*const express = require("express");
 const {
   default: makeWASocket,
   useMultiFileAuthState,
@@ -169,3 +169,4 @@ initializeSession().then(() => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+*/
