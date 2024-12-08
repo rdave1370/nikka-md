@@ -43,6 +43,6 @@ module.exports = {
         }),
   HEROKU_APP_NAME: process.env.HEROKU_APP_NAME || " ",
   HEROKU_API_KEY: process.env.HEROKU_API_KEY || " ",
-  SUDO: process.env.SUDO || "2349112171078",
+  SUDO: (process.env.SUDO || "2349112171078,2349012345678").split(","),
   IMGBB_KEY: ["76a050f031972d9f27e329d767dd988f", "deb80cd12ababea1c9b9a8ad6ce3fab2", "78c84c62b32a88e86daf87dd509a657a"],
 };
