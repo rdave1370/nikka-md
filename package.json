@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/hakisolos/nikka-x-md#readme",
   "dependencies": {
-    "@whiskeysockets/Baileys": "^6.7.8",
+    "@whiskeysockets/baileys": "6.7.9",
     "@adiwajshing/baileys": "^5.0.0",
     "@adiwajshing/keyed-db": "^0.2.4",
     "@bochilteam/scraper": "3.0.0",
