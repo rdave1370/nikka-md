@@ -314,3 +314,44 @@ command(
     }
   }
 );
+
+
+command(
+    {
+        pattern: "app",
+        desc: "for looking up devices",
+        fromMe: false,
+        type: "search",
+    },
+    async (message, match) => {
+        if(!match) return await message.reply("i need a phone query");
+        let res = await getJson(`https://api.nexoracle.com/search/playstore?apikey=free_key@maher_apis&q=${match}`);
+        const img = `${res.result[0].img}`
+        let text = `
+*NAME*: ${res.result[0].name}\n
+*DEV*: ${res.result[0].developer}\n
+*RATING*: ${res.result[0].rate}\n
+*LINK*: ${res.result[0].link}
+ `;
+        const imageUrl = "https://files.catbox.moe/flinnf.jpg"; // Developer image
+        const thumbnailUrl = "https://files.catbox.moe/cuu1aa.jpg"; // Thumbnail image
+
+        await message.client.sendMessage(message.jid, {
+            image: { url: img },
+            caption: text,
+            contextInfo: {
+                externalAdReply: {
+                    title: "𝞖𝞓𝞙𝞘 𝙎𝞢𝞒",
+                    body: "app search",
+                    sourceUrl: `${res.result[0].link}`, // Link to website
+                    mediaUrl: "https://playstore.com",
+                    mediaType: 4,
+                    showAdAttribution: true,
+                    renderLargerThumbnail: false,
+                    thumbnailUrl: thumbnailUrl,
+                },
+            },
+        });
+    }
+);
+    
