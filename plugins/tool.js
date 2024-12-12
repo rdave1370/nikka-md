@@ -1,4 +1,4 @@
-const { command, qrcode, isUrl, isPrivate, findMusic } = require("../lib/");
+const { command, getJson, qrcode, isUrl, isPrivate, findMusic } = require("../lib/");
 const jimp = require("jimp");
 const QRReader = require("qrcode-reader");
 let { unlink } = require("fs/promises");
@@ -91,4 +91,39 @@ await message.sendFile(downloadedMedia)
   }
 );
 
-// Zeta-XD 
+// Zeta-XD
+ 
+
+command(
+    {
+        pattern: "obf",
+        desc: "obfuscate JavaScript code",
+        type: "tools",
+        fromMe: isPrivate,  
+    },
+    async (message) => {
+        try {
+            if (!message.reply_message || !message.reply_message.text) {
+                return await message.sendMessage("Reply to a JavaScript code.");
+            }
+
+            const code = encodeURIComponent(message.reply_message.text);
+            const url = `https://api.nexoracle.com/misc/obfuscate?apikey=free_key@maher_apis&code=${code}`;
+            console.log("Fetching obfuscated code from API:", url);
+
+            const res = await getJson(url);
+            console.log("API Response:", res);
+
+            if (!res || !res.result) {
+                return await message.sendMessage("Failed to obfuscate the code. Try again later.");
+            }
+
+            const obfuscatedCode = res.result;
+            await message.reply(obfuscatedCode);
+
+        } catch (error) {
+            console.error("Error occurred while processing obfuscation:", error);
+            await message.sendMessage("Error occurred while processing the obfuscation. Please try again later.");
+        }
+    }
+);
