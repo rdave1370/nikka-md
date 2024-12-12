@@ -586,3 +586,74 @@ command(
         });
     }
 );
+
+
+command(
+  {
+    pattern: "grouppic",
+    fromMe: true,
+    desc: "Fetch the profile picture of the current group chat.",
+    type: "group",
+  },
+  async (message) => {
+    try {
+      if (!message.isGroup) {
+        return await message.reply("This command can only be used in group chats.");
+      }
+
+      // Fetch the group profile picture URL
+      const groupPicUrl = await message.client.profilePictureUrl(message.jid, "image").catch(() => null);
+
+      if (!groupPicUrl) {
+        return await message.reply("No profile picture found for this group.");
+      }
+
+      // Send the group profile picture
+      await message.client.sendMessage(message.jid, {
+        image: { url: groupPicUrl },
+        caption: "Here is the profile picture of this group chat.",
+      });
+    } catch (error) {
+      console.error("Error fetching group profile picture:", error);
+      await message.reply("An error occurred while fetching the group profile picture. Please try again later.");
+    }
+  }
+);
+
+
+command(
+  {
+    pattern: "profic",
+    fromMe: true,
+    desc: "Fetch the profile picture of a mentioned or replied user.",
+    type: "utility",
+  },
+  async (message) => {
+    try {
+      // Check if a user is mentioned or a message is replied to
+      const targetUser =
+        message.mentionedJid?.[0] || // Get the first mentioned user
+        (message.reply_message ? message.reply_message.jid : null); // Get the user in the replied message
+
+      if (!targetUser) {
+        return await message.reply("Please mention a user or reply to a user's message.");
+      }
+
+      // Fetch the profile picture URL
+      const profilePicUrl = await message.client.profilePictureUrl(targetUser, "image").catch(() => null);
+
+      if (!profilePicUrl) {
+        return await message.reply("No profile picture found for the specified user.");
+      }
+
+      // Send the profile picture
+      await message.client.sendMessage(message.jid, {
+        image: { url: profilePicUrl },
+        caption: "Here is the profile picture of the specified user.",
+      });
+    } catch (error) {
+      console.error("Error fetching profile picture:", error);
+      await message.reply("An error occurred while fetching the profile picture. Please try again later.");
+    }
+  }
+);
