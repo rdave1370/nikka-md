@@ -1,4 +1,4 @@
-const { command, getJson } = require("../lib/");
+const { command, isPrivate getJson } = require("../lib/");
 
 const apiKey = "nikka"; // API key for the search
 const searchApi = "https://nikka-api.us.kg/search/yts?q="; // Search API URL
