@@ -60,5 +60,6 @@ const imageUrl = "https://files.catbox.moe/etg6fk.jpg"; // Replace with your ima
 👉 <a href = "#">STAR KING</a></br>
 👉 <a href = "#">IRON M4N</a></br>
 👉 <a href = "#">PARADOXICAL</a></br>
+👉 <a href = "#">EPZY</a></br>
 
 ## all rights reserved, made with so much ❤️ by haki🍀
