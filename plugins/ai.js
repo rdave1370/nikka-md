@@ -233,7 +233,31 @@ command(
     }
 );
 
+command(
+    {
+        pattern: "shaka",
+        desc: "interact with shaka ai",
+        type: "ai",
+        fromMe: false,
+    },
+    async (message, match) => {
+        const query = message.reply_message 
+            ? `${match || ""} ${message.reply_message.text}`.trim() 
+            : match;
 
+        if (!query) {
+            return await message.reply("Provide search query");
+        }
+
+        try {
+            var res = await getJson(`https://nikka-api.us.kg/ai/moshai?q=${query}&apiKey=nikka`);
+            var tex = res.data || "fekd up";
+            await message.reply(tex);
+        } catch (error) {
+            await message.reply(error);
+        }
+    }
+);
 
 
 
