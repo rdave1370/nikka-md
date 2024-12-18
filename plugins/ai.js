@@ -68,7 +68,7 @@ command(
 
 command(
     {
-        pattern: "1anything",
+        pattern: "anything",
         desc: "anime ai cmd",
         fromMe: isPrivate,
         type: "ai",
@@ -99,6 +99,23 @@ command(
     }
 );
 
+const { command, isPrivate, getJson, getBuffer } = require("../lib");
+
+
+command(
+    {
+        pattern: "blackbox",
+        desc: "blackbox ai chat",
+        fromMe: isPrivate,
+        type: "ai",   
+    },
+    async(message, match) => {
+        if (!match) return await message.reply("i need a search query")
+        const response = await getjson(`https://api.nexoracle.com/ai/blackbox?apikey=elDrYH7GsuIeBkyw1&prompt=${match}`);
+        const res = response.result;
+        await message.client.sendMessage(message.jid, res);
+    }
+);
 
 
 
