@@ -99,7 +99,7 @@ command(
     }
 );
 
-const { command, isPrivate, getJson, getBuffer } = require("../lib");
+//const { command, isPrivate, getJson, getBuffer } = require("../lib");
 
 
 command(
