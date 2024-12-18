@@ -171,3 +171,60 @@ _Downloading the file. This may take some time._
         }
     }
 );
+command(
+    {
+        pattern: "play",
+        desc: "Downloading media",
+        type: "downloader",
+        fromMe: isPrivate,
+    },
+    async (message, match) => {
+        try {
+            if (!match) {
+                return await message.reply("Provide a media query.");
+            }
+
+            const response = await getJson(`https://api.giftedtech.my.id/api/search/yts?apikey=king_haki-k7gjd8@gifted_api&query=${match}`);
+            
+            // Check if results exist
+            if (!response || !response.results || response.results.length === 0) {
+                return await message.reply("No media found for the given query.");
+            }
+
+            const res = response.results[0];
+            
+            const responsedl = await getJson(`https://api.giftedtech.my.id/api/download/ytmp3?apikey=king_haki-k7gjd8@gifted_api&url=${res.url}`);
+
+            // Check if download URL exists
+            if (!responsedl || !responsedl.result) {
+                return await message.reply("Failed to retrieve download URL.");
+            }
+
+            const resdl = responsedl.result; // Corrected this line
+
+            const text = `
+Nikka MD Media Downloader
+
+*Name*: ${res.title}
+*Description*: ${res.description}
+*URL*: ${res.url}
+            `;
+
+            // Send the image with the text as a caption
+            await message.client.sendMessage(message.jid, {
+                image: { url: res.image }, // Image URL from API response
+                caption: text, // Text as caption
+            });
+            
+            // Send the audio with the caption
+            await message.client.sendMessage(message.jid, {
+                audio: { url: `${resdl.download_url}` }, // Directly using resdl
+                caption: `*${res.title}*`,
+                mimetype: "audio/mpeg",
+            });
+        } catch (error) {
+            console.error(error);
+            await message.reply("if your seeing this error, jusr redo the command it will work);
+        }
+    }
+);
