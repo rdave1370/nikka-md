@@ -173,6 +173,34 @@ https://api.nexoracle.com/ai/chatgpt-3?apikey=free_key@maher_apis&prompt=${encod
     }
 );
 
+command(
+    {
+        pattern: "guru",
+        desc: "blackbox AI chat",
+        fromMe: isPrivate,
+        type: "ai",
+    },
+    async (message, match) => {
+        if (!match) {
+            return await message.reply("I need a search query.");
+        }
+
+        try {
+            const response = await getJson(`
+https://api.nexoracle.com/ai/degree-guru?apikey=free_key@maher_apis&prompt=${encodeURIComponent(match)}`);
+            if (response && response.result) {
+                // Send only the "result" field
+                await message.reply(response.result);
+            } else {
+                await message.reply("No valid response received. Please try again later.");
+            }
+        } catch (error) {
+            console.error(error);
+            await message.reply("An error occurred while processing your request. Please try again.");
+        }
+    }
+);
+
 
 
 
