@@ -118,6 +118,32 @@ command(
 );
 
 
+command(
+    {
+        pattern: "gpt4",
+        desc: "AI chat",
+        fromMe: isPrivate,
+        type: "ai",
+    },
+    async (message, match) => {
+        if (!match) {
+            return await message.reply("I need a search query.");
+        }
+
+        try {
+            const response = await getJson(`https://api.nexoracle.com/ai/chatgpt-v4?apikey=elDrYH7GsuIeBkyw1&prompt=${encodeURIComponent(match)}`);
+            if (response && response.result) {
+                // Send only the "result" field
+                await message.reply(response.result);
+            } else {
+                await message.reply("No valid response received. Please try again later.");
+            }
+        } catch (error) {
+            console.error(error);
+            await message.reply("An error occurred while processing your request. Please try again.");
+        }
+    }
+);
 
 
 
