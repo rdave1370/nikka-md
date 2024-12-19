@@ -259,6 +259,71 @@ command(
     }
 );
 
+command(
+    {
+        pattern: "simsiai",
+        desc: "AI chat",
+        type: "ai",
+        fromMe: isPrivate,
+    },
+    async (message, match) => {
+        if (!match) {
+            return await message.reply("Please provide a query!");
+        }
+
+        try {
+            // Fetch data from the Simsimi API
+            const response = await getJson(`https://api.giftedtech.my.id/api/ai/simsimi?apikey=gifted&query=${match}`);
+
+            // Check if the response is valid and has a result
+            if (response && response.result) {
+                const res = response.result;  // The response from Simsimi API
+                await message.reply(res);
+            } else {
+                // If the response doesn't have a valid result
+                await message.reply("Sorry, I couldn't get a valid response from the API.");
+            }
+        } catch (error) {
+            // Catch any errors from the API request or the code
+            console.error("Error fetching data from Simsimi API:", error);
+            await message.reply("An error occurred while processing your request. Please try again later.");
+        }
+    }
+);
+
+command(
+    {
+        pattern: "wwdgpt",
+        desc: "AI chat",
+        type: "ai",
+        fromMe: isPrivate,
+    },
+    async (message, match) => {
+        if (!match) {
+            return await message.reply("Please provide a query!");
+        }
+
+        try {
+            // Fetch data from the Simsimi API
+            const response = await getJson(`https://api.giftedtech.my.id/api/ai/wwdgpt?apikey=gifted&prompt=${match}`);
+
+            // Check if the response is valid and has a result
+            if (response && response.result) {
+                const res = response.result;  // The response from Simsimi API
+                await message.reply(res);
+            } else {
+                // If the response doesn't have a valid result
+                await message.reply("Sorry, I couldn't get a valid response from the API.");
+            }
+        } catch (error) {
+            // Catch any errors from the API request or the code
+            console.error("Error fetching data from Simsimi API:", error);
+            await message.reply("An error occurred while processing your request. Please try again later.");
+        }
+    }
+);
+
+
 
 
 
