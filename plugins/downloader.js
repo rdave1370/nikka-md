@@ -286,3 +286,43 @@ Nikka MD Media Downloader
         }
     }
 );
+/*const { command } = require("../lib");
+const axios = require("axios"); */
+
+command(
+  {
+    pattern: "fb",
+    fromMe: true,
+    desc: "Download Facebook reels",
+    type: "downloader",
+  },
+  async (message, match) => {
+    try {
+      let url = match;
+      if (!url && message.reply_message) {
+        url = message.reply_message.text.match(/https?:\/\/[^\s]+/g)?.[0];
+      }
+
+      if (!url) {
+        return await message.reply("Please provide a valid Facebook reel URL.");
+      }
+
+      const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=free_key@maher_apis&url=${url}`;
+      const response = await axios.get(apiUrl);
+
+      if (!response.data || !response.data.result || !response.data.result.HD) {
+        return await message.reply("Failed to fetch the video. Please check the URL or try again.");
+      }
+
+      const videoUrl = response.data.result.HD;
+
+      await message.sendFromUrl(videoUrl, {
+        mimetype: "video/mp4",
+        caption: "Here's your Facebook reel!",
+      });
+    } catch (error) {
+      console.error("Error in fbdown command:", error.message);
+      await message.reply("An error occurred while downloading the Facebook reel.");
+    }
+  }
+);
