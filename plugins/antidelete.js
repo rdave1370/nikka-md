@@ -1,4 +1,4 @@
-const { command, isPrivate } = require('../lib');
+/*const { command, isPrivate } = require('../lib');
 const { getAnti, setAnti, initializeAntiDeleteSettings } = require('../db');
 
 initializeAntiDeleteSettings();
@@ -70,3 +70,4 @@ command(
 		return await message.sendMessage(message.jid, helpMessage);
 	},
 );
+*/
