@@ -1,5 +1,5 @@
-const { command, isPrivate } = require('#lib');
-const { getAnti, setAnti, initializeAntiDeleteSettings } = require('#sql');
+const { command, isPrivate } = require('../lib');
+const { getAnti, setAnti, initializeAntiDeleteSettings } = require('../db');
 
 initializeAntiDeleteSettings();
 
