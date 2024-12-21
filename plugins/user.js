@@ -254,7 +254,7 @@ Licensed under the  GPL-3.0 License;
 you may not use this file except in compliance with the License.
 Lo- Zeta-X0
 */
-
+/*
 command(
   {
     pattern: "menu",
@@ -354,7 +354,7 @@ Description: ${i.desc}\`\`\``);
     }
   }
 );
-/* Copyright (C) 2024 Louis-X0.
+* Copyright (C) 2024 Louis-X0.
 Licensed under the  GPL-3.0 License;
 you may not use this file except in compliance with the License.
 Louis-X0 - Zeta-X0
