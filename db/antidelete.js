@@ -1,4 +1,4 @@
-const { DATABASE } = require('#lib');
+const { DATABASE } = require('../lib');
 const { DataTypes } = require('sequelize');
 
 const AntiDelDB = DATABASE.define(
