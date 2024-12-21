@@ -1,4 +1,4 @@
-const { DATABASE } = require('../lib');
+/*const { DATABASE } = require('../lib');
 const { DataTypes } = require('sequelize');
 
 const AntiDelDB = DATABASE.define(
@@ -89,3 +89,4 @@ async function getAllAntiDeleteSettings() {
 }
 
 module.exports = { AntiDelDB, initializeAntiDeleteSettings, setAnti, getAnti, getAllAntiDeleteSettings };
+*/
