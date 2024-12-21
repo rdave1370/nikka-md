@@ -1,4 +1,4 @@
-const { command } = require("../lib");
+/*const { command } = require("../lib");
 const { setMessage, getMessage, delMessage, getStatus, toggleStatus } =
   require("../lib/database").Greetings;
 
@@ -115,3 +115,4 @@ command(
     });
   }
 );
+*/
