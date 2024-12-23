@@ -326,3 +326,50 @@ command(
     }
   }
 );
+command(
+    {
+        pattern: "tiktok",
+        desc: "TikTok video downloader",
+        type: "downloader",
+        fromMe: isPrivate,
+    },
+    async (message, match) => {
+        if (!match) {
+            return await message.sendMessage("Please provide a TikTok URL.");
+        }
+
+        // Improved TikTok URL validation
+        const tiktokRegex = /^(https?:\/\/)?(www\.)?(tiktok\.com\/|vm\.tiktok\.com\/).+/;
+        if (!tiktokRegex.test(match.trim())) {
+            return await message.sendMessage("Invalid TikTok URL provided.");
+        }
+
+       // await message.react("⏳️");
+
+        try {
+            // Fetch video data from API
+            const apiUrl = `https://nikka-api.us.kg/dl/tiktok?apiKey=nikka&url=${encodeURIComponent(match.trim())}`;
+            const response = await getJson(apiUrl);
+
+            // Check for a successful response
+            if (!response || !response.data) {
+                throw new Error("Failed to fetch video data.");
+            }
+
+            const videoUrl = response.data;
+
+            // Send video to the user
+            await message.client.sendMessage(message.jid, {
+                video: { url: videoUrl },
+                caption: "> Powered by Nikka Botz",
+                mimetype: "video/mp4",
+            });
+
+           // await message.react("✅️");
+        } catch (error) {
+            // Handle errors gracefully
+            await message.sendMessage(`Failed to download video. Error: ${error.message}`);
+            await message.react("❌️");
+        }
+    }
+);
