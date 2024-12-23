@@ -11,7 +11,7 @@ Create your own version and customize NIKKA MD to suit your needs!
 
 ---  
 ## GET SESSION 
-<a href="nikka-x.onrender.com">Here</a>
+[![here](https://img.shields.io/badge/get-session-blue?style=for-the-badge)](https://nikka-x.onrender.com)  
 
 ## ⭐ **Star This Project**  
 Support the development of NIKKA MD by starring the repository!  
